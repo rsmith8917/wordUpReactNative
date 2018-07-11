@@ -26,12 +26,12 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#515151'
   },
   header: {
     width: '100%',
-    height: 50,
-    backgroundColor: 'red'
+    height: 45
   },
   body: {
     width: '100%',
@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     width: '100%',
-    flex: 1,
-    backgroundColor: 'blue'
+    flex: 1
   }
 });
