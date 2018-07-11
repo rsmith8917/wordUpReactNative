@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 
 const GridItem = (props) => {
     return (
         <View style={styles.gridItem}>
-            <Text>
-                A
-            </Text>
+            <TouchableOpacity onPress={props.deleteHandler.bind(null, props.id)}>
+                {props.children}
+            </TouchableOpacity>
         </View>
     );
 }
@@ -15,10 +15,10 @@ const styles = StyleSheet.create({
     gridItem: {
         borderColor: 'black',
         borderBottomWidth: 1,
-        flex: 1,
+        aspectRatio: 1,
         justifyContent: 'center',
         alignItems: 'center'
     }
-  });
+});
 
 export default GridItem;

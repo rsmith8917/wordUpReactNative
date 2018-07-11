@@ -1,17 +1,16 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, FlatList, Text } from 'react-native';
 import GridItem from './GridItem';
 
 const GridColumn = (props) => {
     return (
         <View style={styles.gridColumn}>
-            <GridItem />
-            <GridItem />
-            <GridItem />
-            <GridItem />
-            <GridItem />
-            <GridItem />
-            <GridItem />
+            <FlatList
+                // scrollEnabled={false}
+                // showsVerticalScrollIndicator={false}
+                data={props.letters}
+                renderItem={({ item }) => <GridItem key={item.key} id={item.key} deleteHandler={props.deleteHandler} ><Text>{item.data}</Text></GridItem>}
+            />
         </View>
     );
 }
@@ -23,6 +22,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column'
     }
-  });
+});
 
 export default GridColumn;
