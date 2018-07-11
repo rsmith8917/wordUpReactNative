@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import GridColumn from './GridColumn';
 
-const Grid = (props) => {
-    return (
-        <View style={styles.grid}>
-            {props.children}
-        </View>
-    );
+export default class Grid extends Component {
+    render() {
+        return (
+            <View style={styles.grid}>
+                <GridColumn />
+                <GridColumn />
+                <GridColumn />
+                <GridColumn />
+                <GridColumn />
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -14,10 +21,8 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderLeftWidth: 1,
         borderColor: 'black',
-        flexDirection: 'column',
+        flexDirection: 'row',
         width: '100%',
-        aspectRatio: 1
+        aspectRatio: 0.714
     }
-  });
-
-export default Grid;
+});

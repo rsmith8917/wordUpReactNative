@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 const GridItem = (props) => {
     return (
         <View style={styles.gridItem}>
-            {props.children}
+            <Text>
+                A
+            </Text>
         </View>
     );
 }
@@ -12,7 +14,7 @@ const GridItem = (props) => {
 const styles = StyleSheet.create({
     gridItem: {
         borderColor: 'black',
-        borderRightWidth: 1,
+        borderBottomWidth: 1,
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
