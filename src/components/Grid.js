@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import {
     View,
+    Text,
     StyleSheet,
     LayoutAnimation,
     PanResponder
 } from 'react-native';
 import GridColumn from './GridColumn';
+import { generateLetter, generateLetterGrid } from '../modules/GenerateLetters';
 
 
 export default class Grid extends Component {
@@ -30,11 +32,10 @@ export default class Grid extends Component {
                 const boxEdgeLength = this.state.layout.width / numOfCols;
                 const numOfRows = this.state.layout.height / boxEdgeLength;
                 const col = Math.floor((x / this.state.layout.width) * numOfCols);
-                const row = Math.floor((y / this.state.layout.height) * numOfRows);
+                const row = Math.floor((y / this.state.layout.height) * 5);
                 const selectedItemKey = this.state.letters[col][row].key;
-                console.log(`KEY: ${selectedItemKey}`);
                 this.setState({ selectedItemKey });
-                this.markItemForDeletion(selectedItemKey);
+                this.markItemForDeletion(this.state.letters[col][row]);
             },
             onPanResponderTerminationRequest: (evt, gestureState) => true,
             onPanResponderRelease: (evt, gestureState) => {
@@ -48,7 +49,8 @@ export default class Grid extends Component {
         });
 
         this.state = {
-            letters: this.generateLetterGrid()
+            letters: generateLetterGrid(),
+            word: ''
         };
 
         this.markItemForDeletion = this.markItemForDeletion.bind(this);
@@ -60,13 +62,17 @@ export default class Grid extends Component {
         });
     }
 
-    markItemForDeletion(key) {
-        this.itemsToDelete.push(parseInt(key, 10));
+    markItemForDeletion(item) {
+        const keyInt = parseInt(item.key, 10);
+        if (this.itemsToDelete.indexOf(keyInt) === -1) {
+            this.itemsToDelete.push(keyInt);
+            this.setState(previousState => ({ word: (previousState.word + item.data).toUpperCase() }));
+        }
     }
 
     deleteItems() {
-        LayoutAnimation.easeInEaseOut();
-        // LayoutAnimation.spring();
+        // LayoutAnimation.easeInEaseOut();
+        LayoutAnimation.spring();
         this.setState(previousState => {
             const newLetters = [];
             for (let i = 0; i < previousState.letters.length; i++) {
@@ -82,142 +88,35 @@ export default class Grid extends Component {
                     }
                 }
                 for (let k = 0; k < deleted; k++) {
-                    letterRow.push({ key: deletedKeys[k], data: this.generateLetter() });
+                    letterRow.push({ key: deletedKeys[k], data: generateLetter() });
                 }
                 newLetters.push(letterRow);
             }
             this.itemsToDelete = [];
-            return { letters: newLetters };
+            return { letters: newLetters, word: '' };
         });
-    }
-
-    generateLetterGrid() {
-        const letterGrid = [];
-        let keyCount = 0;
-
-        for (let i = 0; i < 5; i++) {
-            const letterRow = [];
-            for (let j = 0; j < 10; j++) {
-                keyCount += 1;
-                letterRow[j] = { key: keyCount.toString(), data: this.generateLetter() };
-            }
-            letterGrid[i] = letterRow;
-        }
-
-        return letterGrid;
-    }
-
-    generateLetter() {
-        const r = Math.floor(Math.random() * 150);
-        let c;
-        if (r < 19) {
-            c = 'E';
-        } else if (r < 32) {
-            c = 'T';
-        } else if (r < 56) {
-            switch (Math.floor(Math.random() * 2)) {
-                case 0:
-                    c = 'A';
-                    break;
-                default:
-                    c = 'R';
-                    break;
-            }
-        } else if (r < 89) {
-            switch (Math.floor(Math.random() * 3)) {
-                case 0:
-                    c = 'I';
-                    break;
-                case 1:
-                    c = 'N';
-                    break;
-                default:
-                    c = 'O';
-                    break;
-            }
-        } else if (r < 98) {
-            c = 'S';
-        } else if (r < 104) {
-            c = 'D';
-        } else if (r < 119) {
-            switch (Math.floor(Math.random() * 3)) {
-                case 0:
-                    c = 'C';
-                    break;
-                case 1:
-                    c = 'H';
-                    break;
-                default:
-                    c = 'L';
-                    break;
-            }
-        } else if (r < 135) {
-            switch (Math.floor(Math.random() * 4)) {
-                case 0:
-                    c = 'F';
-                    break;
-                case 1:
-                    c = 'M';
-                    break;
-                case 2:
-                    c = 'P';
-                    break;
-                default:
-                    c = 'U';
-                    break;
-            }
-        } else if (r < 141) {
-            switch (Math.floor(Math.random() * 2)) {
-                case 0:
-                    c = 'G';
-                    break;
-                default:
-                    c = 'Y';
-                    break;
-            }
-        } else if (r < 143) {
-            c = 'W';
-        } else {
-            switch (Math.floor(Math.random() * 7)) {
-                case 0:
-                    c = 'B';
-                    break;
-                case 1:
-                    c = 'J';
-                    break;
-                case 2:
-                    c = 'K';
-                    break;
-                case 3:
-                    c = 'Qu';
-                    break;
-                case 4:
-                    c = 'V';
-                    break;
-                case 5:
-                    c = 'X';
-                    break;
-                default:
-                    c = 'Z';
-                    break;
-            }
-        }
-        return c;
     }
 
     render() {
         return (
-            <View {...this._panResponder.panHandlers} style={styles.grid} onLayout={this.onLayout} >
-                {
-                    this.state.letters.map((letterCol, i) =>
-                        <GridColumn
-                            letters={letterCol}
-                            key={i}
-                            selectedHandler={this.markItemForDeletion}
-                            selectedItemKey={this.state.selectedItemKey}
-                        />
-                    )
-                }
+            <View>
+                <View {...this._panResponder.panHandlers} style={styles.grid} onLayout={this.onLayout} >
+                    {
+                        this.state.letters.map((letterCol, i) =>
+                            <GridColumn
+                                letters={letterCol}
+                                key={i}
+                                selectedHandler={this.markItemForDeletion}
+                                selectedItemKey={this.state.selectedItemKey}
+                            />
+                        )
+                    }
+                </View>
+                <View style={styles.wordView}>
+                    <Text style={styles.word}>
+                        {this.state.word}
+                    </Text>
+                </View>
             </View>
         );
     }
@@ -230,5 +129,13 @@ const styles = StyleSheet.create({
         borderWidth: 5,
         borderColor: '#e2d1ba',
         backgroundColor: 'white'
+    },
+    wordView: {
+        height: 50,
+        alignItems: 'center'
+    },
+    word: {
+        fontSize: 30,
+        color: 'red'
     }
 });

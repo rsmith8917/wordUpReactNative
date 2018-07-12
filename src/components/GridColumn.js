@@ -20,7 +20,7 @@ export default class GridColumn extends Component {
                             <GridItem
                                 key={item.key}
                                 id={item.key}
-                                selectedHandler={this.props.selectedHandler}
+                                // selectedHandler={this.props.selectedHandler}
                                 letter={item.data}
                                 selectedItemKey={this.props.selectedItemKey}
                             />

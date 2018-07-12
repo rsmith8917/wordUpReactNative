@@ -11,12 +11,9 @@ export default class Grid extends Component {
             x: 0,
             y: 0
         };
-
-        // this.props = props;
     }
 
     render() {
-        // console.log(this.props);
         const colors = {};
         colors.A = '#f9fbdb';
         colors.B = '#f1ded4';
