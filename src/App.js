@@ -1,14 +1,14 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { 
+  View, 
+  StyleSheet,
+  NativeModules } from 'react-native';
 import Grid from './components/Grid';
-// import GridColumn from './components/GridColumn';
-// import GridItem from './components/GridItem';
+
+const { UIManager } = NativeModules;
+
+UIManager.setLayoutAnimationEnabledExperimental
+ && UIManager.setLayoutAnimationEnabledExperimental(true);
 
 export default class App extends Component {
   render() {
