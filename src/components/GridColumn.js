@@ -14,15 +14,15 @@ export default class GridColumn extends Component {
                     scrollEnabled={false}
                     showsVerticalScrollIndicator={false}
                     data={this.props.letters}
-                    extraData={this.props.dragXY}
+                    extraData={this.props.selectedItemKey}
                     renderItem={
                         ({ item }) =>
                             <GridItem
                                 key={item.key}
                                 id={item.key}
-                                deleteHandler={this.props.deleteHandler}
+                                selectedHandler={this.props.selectedHandler}
                                 letter={item.data}
-                                dragXY={this.props.dragXY}
+                                selectedItemKey={this.props.selectedItemKey}
                             />
                     }
                 />

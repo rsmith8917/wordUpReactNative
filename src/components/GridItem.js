@@ -15,17 +15,6 @@ export default class Grid extends Component {
         // this.props = props;
     }
 
-    onLayout = (e) => {
-        this.refs.Marker.measure((x, y, width, height, pageX, pageY) => {
-            this.setState({
-                width,
-                height,
-                x: pageX,
-                y: pageY
-            });
-        });
-    }
-
     render() {
         // console.log(this.props);
         const colors = {};
@@ -56,12 +45,7 @@ export default class Grid extends Component {
         colors.X = '#d0f5e3';
         colors.Z = '#f3f1ee';
 
-        const inBoundsX = (this.props.dragXY.x > this.state.x) && (this.props.dragXY.x < (this.state.x + this.state.width));
-        const inBoundsY = (this.props.dragXY.y > this.state.y) && (this.props.dragXY.y < (this.state.y + this.state.height));
-        const highlight = inBoundsX && inBoundsY;
-
-        // console.log(inBoundsX);
-
+        const highlight = this.props.selectedItemKey === this.props.id;
         const styles = StyleSheet.create({
             gridItem: {
                 borderColor: '#e2d1ba',

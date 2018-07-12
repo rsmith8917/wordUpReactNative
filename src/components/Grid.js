@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { 
-    View, 
+import {
+    View,
     StyleSheet,
     LayoutAnimation,
-    PanResponder } from 'react-native';
+    PanResponder
+} from 'react-native';
 import GridColumn from './GridColumn';
 
 
@@ -11,50 +12,66 @@ export default class Grid extends Component {
     constructor(props) {
         super(props);
 
+        this.itemsToDelete = [];
+
         this._panResponder = PanResponder.create({
             // Ask to be the responder:
             onStartShouldSetPanResponder: (evt, gestureState) => true,
             onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
             onMoveShouldSetPanResponder: (evt, gestureState) => true,
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-    
+
             onPanResponderGrant: (evt, gestureState) => {
             },
             onPanResponderMove: (evt, gestureState) => {
-                this.setState({ dragXY: { x: gestureState.moveX, y: gestureState.moveY } });
+                const x = gestureState.moveX;
+                const y = gestureState.moveY;
+                const col = Math.floor((x / this.state.layout.width) * 5);
+                const row = Math.floor((y / this.state.layout.height) * 5);
+                const selectedItemKey = this.state.letters[col][row].key;
+                console.log(`KEY: ${selectedItemKey}`);
+                this.setState({ selectedItemKey });
+                this.markItemForDeletion(selectedItemKey);
             },
             onPanResponderTerminationRequest: (evt, gestureState) => true,
             onPanResponderRelease: (evt, gestureState) => {
+                this.deleteItems();
             },
             onPanResponderTerminate: (evt, gestureState) => {
             },
             onShouldBlockNativeResponder: (evt, gestureState) => {
-              return true;
+                return true;
             },
-          });
+        });
 
         this.state = {
-            letters: this.generateLetterGrid(),
-            dragXY: {
-                x: 0,
-                y: 0
-            }
+            letters: this.generateLetterGrid()
         };
 
-        this.deleteItem = this.deleteItem.bind(this);
+        this.markItemForDeletion = this.markItemForDeletion.bind(this);
     }
 
-    deleteItem(key) {
+    onLayout = (e) => {
+        this.setState({
+            layout: e.nativeEvent.layout
+        });
+    }
+
+    markItemForDeletion(key) {
+        this.itemsToDelete.push(parseInt(key, 10));
+    }
+
+    deleteItems() {
         const CustomLayoutSpring = {
             duration: 200,
             create: {
-              type: LayoutAnimation.Types.spring,
-              property: LayoutAnimation.Properties.scaleXY,
-              springDamping: 1,
+                type: LayoutAnimation.Types.spring,
+                property: LayoutAnimation.Properties.scaleXY,
+                springDamping: 1,
             },
             update: {
-              type: LayoutAnimation.Types.spring,
-              springDamping: 1,
+                type: LayoutAnimation.Types.spring,
+                springDamping: 1,
             },
         };
         LayoutAnimation.configureNext(CustomLayoutSpring);
@@ -62,19 +79,22 @@ export default class Grid extends Component {
             const newLetters = [];
             for (let i = 0; i < previousState.letters.length; i++) {
                 const letterRow = [];
-                let deleted = false;
+                let deleted = 0;
+                const deletedKeys = [];
                 for (let j = 0; j < previousState.letters[i].length; j++) {
-                    if (previousState.letters[i][j].key !== key) {
+                    if (this.itemsToDelete.indexOf(parseInt(previousState.letters[i][j].key, 10)) === -1) {
                         letterRow.push(previousState.letters[i][j]);
                     } else {
-                        deleted = true;
+                        deleted += 1;
+                        deletedKeys.push(previousState.letters[i][j].key);
                     }
                 }
-                if (deleted) {
-                    letterRow.push({ key, data: this.generateLetter() });
+                for (let k = 0; k < deleted; k++) {
+                    letterRow.push({ key: deletedKeys[k], data: this.generateLetter() });
                 }
                 newLetters.push(letterRow);
             }
+            this.itemsToDelete = [];
             return { letters: newLetters };
         });
     }
@@ -99,7 +119,7 @@ export default class Grid extends Component {
         const r = Math.floor(Math.random() * 150);
         let c;
         if (r < 19) {
-            c = 'E'; 
+            c = 'E';
         } else if (r < 32) {
             c = 'T';
         } else if (r < 56) {
@@ -193,13 +213,17 @@ export default class Grid extends Component {
         return c;
     }
 
-    
     render() {
         return (
-            <View {...this._panResponder.panHandlers} style={styles.grid}>
+            <View {...this._panResponder.panHandlers} style={styles.grid} onLayout={this.onLayout} >
                 {
                     this.state.letters.map((letterCol, i) =>
-                        <GridColumn letters={letterCol} key={i} deleteHandler={this.deleteItem} dragXY={this.state.dragXY} />
+                        <GridColumn
+                            letters={letterCol}
+                            key={i}
+                            selectedHandler={this.markItemForDeletion}
+                            selectedItemKey={this.state.selectedItemKey}
+                        />
                     )
                 }
             </View>
