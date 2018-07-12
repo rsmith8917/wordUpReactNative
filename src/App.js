@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Grid from './components/Grid';
 // import GridColumn from './components/GridColumn';
 // import GridItem from './components/GridItem';
