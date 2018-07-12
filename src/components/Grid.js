@@ -26,8 +26,11 @@ export default class Grid extends Component {
             onPanResponderMove: (evt, gestureState) => {
                 const x = gestureState.moveX;
                 const y = gestureState.moveY;
-                const col = Math.floor((x / this.state.layout.width) * 5);
-                const row = Math.floor((y / this.state.layout.height) * 5);
+                const numOfCols = 5;
+                const boxEdgeLength = this.state.layout.width / numOfCols;
+                const numOfRows = this.state.layout.height / boxEdgeLength;
+                const col = Math.floor((x / this.state.layout.width) * numOfCols);
+                const row = Math.floor((y / this.state.layout.height) * numOfRows);
                 const selectedItemKey = this.state.letters[col][row].key;
                 console.log(`KEY: ${selectedItemKey}`);
                 this.setState({ selectedItemKey });
@@ -62,19 +65,8 @@ export default class Grid extends Component {
     }
 
     deleteItems() {
-        const CustomLayoutSpring = {
-            duration: 200,
-            create: {
-                type: LayoutAnimation.Types.spring,
-                property: LayoutAnimation.Properties.scaleXY,
-                springDamping: 1,
-            },
-            update: {
-                type: LayoutAnimation.Types.spring,
-                springDamping: 1,
-            },
-        };
-        LayoutAnimation.configureNext(CustomLayoutSpring);
+        LayoutAnimation.easeInEaseOut();
+        // LayoutAnimation.spring();
         this.setState(previousState => {
             const newLetters = [];
             for (let i = 0; i < previousState.letters.length; i++) {
