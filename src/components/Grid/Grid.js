@@ -3,56 +3,28 @@ import {
     View,
     Text,
     StyleSheet,
-    LayoutAnimation,
-    PanResponder
+    LayoutAnimation
 } from 'react-native';
-import GridColumn from './GridColumn';
-import { generateLetter, generateLetterGrid } from '../modules/GenerateLetters';
+import GridColumn from '../GridColumn';
+import { createPanResponder } from './CreatePanResponder';
+import { generateLetter, generateLetterGrid } from './GenerateLetters';
 
 
 export default class Grid extends Component {
     constructor(props) {
         super(props);
-
         this.itemsToDelete = [];
-
-        this._panResponder = PanResponder.create({
-            // Ask to be the responder:
-            onStartShouldSetPanResponder: (evt, gestureState) => true,
-            onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-            onMoveShouldSetPanResponder: (evt, gestureState) => true,
-            onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-
-            onPanResponderGrant: (evt, gestureState) => {
-            },
-            onPanResponderMove: (evt, gestureState) => {
-                const x = gestureState.moveX;
-                const y = gestureState.moveY;
-                const numOfCols = 5;
-                const boxEdgeLength = this.state.layout.width / numOfCols;
-                const numOfRows = this.state.layout.height / boxEdgeLength;
-                const col = Math.floor((x / this.state.layout.width) * numOfCols);
-                const row = Math.floor((y / this.state.layout.height) * 5);
-                const selectedItemKey = this.state.letters[col][row].key;
-                this.setState({ selectedItemKey });
-                this.markItemForDeletion(this.state.letters[col][row]);
-            },
-            onPanResponderTerminationRequest: (evt, gestureState) => true,
-            onPanResponderRelease: (evt, gestureState) => {
-                this.deleteItems();
-            },
-            onPanResponderTerminate: (evt, gestureState) => {
-            },
-            onShouldBlockNativeResponder: (evt, gestureState) => {
-                return true;
-            },
-        });
-
+        this.panResponder = createPanResponder(
+            this.onGrant.bind(this), 
+            this.onMove.bind(this), 
+            this.deleteItems.bind(this)
+        );
         this.state = {
             letters: generateLetterGrid(),
-            word: ''
+            word: '',
+            selectedItems: [],
+            selectedItemsLength: 0
         };
-
         this.markItemForDeletion = this.markItemForDeletion.bind(this);
     }
 
@@ -62,19 +34,49 @@ export default class Grid extends Component {
         });
     }
 
+    onGrant(evt) {
+        const selectedItem = this.getSelectedItem(evt.nativeEvent.pageX, evt.nativeEvent.pageY);
+        this.markItemForDeletion(selectedItem);
+    }
+
+    onMove(evt, gestureState) {
+        const selectedItem = this.getSelectedItem(gestureState.moveX, gestureState.moveY);
+        this.markItemForDeletion(selectedItem);
+    }
+
+    getSelectedItem(x, y) {
+        const numOfCols = 5;
+        const boxEdgeLength = this.state.layout.width / numOfCols;
+        const numOfRows = this.state.layout.height / boxEdgeLength;
+        const col = Math.floor((x / this.state.layout.width) * numOfCols);
+        const row = Math.floor((y / this.state.layout.height) * 5);
+        return this.state.letters[col][row];
+    }
+
     markItemForDeletion(item) {
+        // Add item to itemsToDelete array if it
+        // is unique. Also, build word from itemsToDelete.
         const keyInt = parseInt(item.key, 10);
         if (this.itemsToDelete.indexOf(keyInt) === -1) {
+            
             this.itemsToDelete.push(keyInt);
-            this.setState(previousState => ({ word: (previousState.word + item.data).toUpperCase() }));
+            this.setState(previousState => (
+                {
+                    word: (previousState.word + item.data).toUpperCase(),
+                    selectedItems: this.itemsToDelete,
+                    selectedItemsLength: this.itemsToDelete.length
+                }
+            ));
         }
     }
 
     deleteItems() {
-        // LayoutAnimation.easeInEaseOut();
         LayoutAnimation.spring();
         this.setState(previousState => {
             const newLetters = [];
+            // Loop through all letters in the grid and selectively
+            // build new grid with letters that have not been marked
+            // for deletion.  Fill in grid with newly generated letters.
             for (let i = 0; i < previousState.letters.length; i++) {
                 const letterRow = [];
                 let deleted = 0;
@@ -100,14 +102,19 @@ export default class Grid extends Component {
     render() {
         return (
             <View>
-                <View {...this._panResponder.panHandlers} style={styles.grid} onLayout={this.onLayout} >
+                <View
+                    {...this.panResponder.panHandlers}
+                    style={styles.grid}
+                    onLayout={this.onLayout}
+                >
                     {
                         this.state.letters.map((letterCol, i) =>
                             <GridColumn
                                 letters={letterCol}
                                 key={i}
                                 selectedHandler={this.markItemForDeletion}
-                                selectedItemKey={this.state.selectedItemKey}
+                                selectedItems={this.state.selectedItems}
+                                selectedItemsLength={this.state.selectedItemsLength}
                             />
                         )
                     }

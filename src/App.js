@@ -3,7 +3,7 @@ import {
   View, 
   StyleSheet,
   NativeModules } from 'react-native';
-import Grid from './components/Grid';
+import Grid from './components/Grid/Grid';
 
 const { UIManager } = NativeModules;
 

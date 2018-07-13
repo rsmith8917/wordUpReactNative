@@ -1,31 +1,29 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import GridItem from './GridItem';
 
-export default class GridColumn extends Component {
-    render() {
-        return (
-            <View style={styles.gridColumn}>
-                <FlatList
-                    scrollEnabled={false}
-                    showsVerticalScrollIndicator={false}
-                    data={this.props.letters}
-                    extraData={this.props.selectedItemKey}
-                    renderItem={
-                        ({ item }) =>
-                            <GridItem
-                                key={item.key}
-                                id={item.key}
-                                // selectedHandler={this.props.selectedHandler}
-                                letter={item.data}
-                                selectedItemKey={this.props.selectedItemKey}
-                            />
-                    }
-                />
-            </View>
-        );
-    }
-}
+const GridColumn = (props) => {
+    return (
+
+        <View style={styles.gridColumn}>
+            <FlatList
+                scrollEnabled={false}
+                showsVerticalScrollIndicator={false}
+                data={props.letters}
+                extraData={props.selectedItemsLength}
+                renderItem={
+                    ({ item }) =>
+                        <GridItem
+                            key={item.key}
+                            id={item.key}
+                            letter={item.data}
+                            selectedItems={props.selectedItems}
+                        />
+                }
+            />
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
     gridColumn: {
@@ -33,3 +31,5 @@ const styles = StyleSheet.create({
         flexDirection: 'column'
     }
 });
+
+export default GridColumn;
