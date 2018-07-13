@@ -29,8 +29,17 @@ export default class Grid extends Component {
     }
 
     onLayout = (e) => {
-        this.setState({
-            layout: e.nativeEvent.layout
+        this.refs.Marker.measure((x, y, width, height, pageX, pageY) => {
+            this.setState({
+                layout: {
+                    x,
+                    y,
+                    width,
+                    height,
+                    pageX,
+                    pageY
+                }
+            });
         });
     }
 
@@ -57,8 +66,8 @@ export default class Grid extends Component {
             return index;
         }
 
-        const relX = x;
-        const relY = y - 95;
+        const relX = x - this.state.layout.pageX;
+        const relY = y - this.state.layout.pageY;
         const numOfCols = 5;
         const boxEdgeLength = this.state.layout.width / numOfCols;
         const numOfRows = this.state.layout.height / boxEdgeLength;
@@ -120,6 +129,7 @@ export default class Grid extends Component {
                 {...this.panResponder.panHandlers}
                 style={styles.grid}
                 onLayout={this.onLayout}
+                ref="Marker"
             >
                 {
                     this.state.letters.map((letterCol, i) =>
