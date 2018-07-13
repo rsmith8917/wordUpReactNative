@@ -28,7 +28,7 @@ export default class Grid extends Component {
         this.markItemForDeletion = this.markItemForDeletion.bind(this);
     }
 
-    onLayout = (e) => {
+    onLayout = () => {
         this.refs.Marker.measure((x, y, width, height, pageX, pageY) => {
             this.setState({
                 layout: {
@@ -54,7 +54,6 @@ export default class Grid extends Component {
     }
 
     getSelectedItem(x, y) {
-
         function posToIndex(pos, length, segments) {
             let index = Math.floor((pos / length) * segments);
             if (index < 0) {
@@ -71,7 +70,6 @@ export default class Grid extends Component {
         const numOfCols = 5;
         const boxEdgeLength = this.state.layout.width / numOfCols;
         const numOfRows = this.state.layout.height / boxEdgeLength;
-        // console.log(`Y: ${relY}, Height: ${this.state.layout.height}`);
         const col = posToIndex(relX, this.state.layout.width, numOfCols);
         const row = posToIndex(relY, this.state.layout.height, numOfRows);
         return this.state.letters[col][row];
@@ -104,7 +102,9 @@ export default class Grid extends Component {
                 let deleted = 0;
                 const deletedKeys = [];
                 for (let j = 0; j < previousState.letters[i].length; j++) {
-                    if (this.itemsToDelete.indexOf(parseInt(previousState.letters[i][j].key, 10)) === -1) {
+                    const key = parseInt(previousState.letters[i][j].key, 10);
+                    const shouldDelete = this.itemsToDelete.indexOf(key) === -1;
+                    if (shouldDelete) {
                         letterRow.push(previousState.letters[i][j]);
                     } else {
                         deleted += 1;
