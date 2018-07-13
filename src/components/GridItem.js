@@ -33,15 +33,17 @@ const GridItem = (props) => {
     const highlight = props.selectedItems.indexOf(parseInt(props.id, 10)) !== -1;
     const styles = StyleSheet.create({
         gridItem: {
-            borderColor: '#e2d1ba',
+            borderColor: highlight ? '#458a93' : '#e2d1ba',
             borderWidth: 5,
-            backgroundColor: highlight ? 'red' : colors[props.letter],
+            backgroundColor: highlight ? '#6ee0ef' : colors[props.letter],
             aspectRatio: 1,
             justifyContent: 'center',
             alignItems: 'center'
         },
         text: {
-            fontSize: 20
+            fontSize: 30,
+            fontWeight: 'bold',
+            color: '#727272'
         }
     });
 

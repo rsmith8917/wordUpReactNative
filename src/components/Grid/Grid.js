@@ -14,14 +14,14 @@ export default class Grid extends Component {
     constructor(props) {
         super(props);
         this.itemsToDelete = [];
+        this.word = '';
         this.panResponder = createPanResponder(
-            this.onGrant.bind(this), 
-            this.onMove.bind(this), 
+            this.onGrant.bind(this),
+            this.onMove.bind(this),
             this.deleteItems.bind(this)
         );
         this.state = {
             letters: generateLetterGrid(),
-            word: '',
             selectedItems: [],
             selectedItemsLength: 0
         };
@@ -45,11 +45,26 @@ export default class Grid extends Component {
     }
 
     getSelectedItem(x, y) {
+
+        function posToIndex(pos, length, segments) {
+            let index = Math.floor((pos / length) * segments);
+            if (index < 0) {
+                index = 0;
+            }
+            if (index >= segments) {
+                index = segments - 1;
+            }
+            return index;
+        }
+
+        const relX = x;
+        const relY = y - 95;
         const numOfCols = 5;
         const boxEdgeLength = this.state.layout.width / numOfCols;
         const numOfRows = this.state.layout.height / boxEdgeLength;
-        const col = Math.floor((x / this.state.layout.width) * numOfCols);
-        const row = Math.floor((y / this.state.layout.height) * 5);
+        // console.log(`Y: ${relY}, Height: ${this.state.layout.height}`);
+        const col = posToIndex(relX, this.state.layout.width, numOfCols);
+        const row = posToIndex(relY, this.state.layout.height, numOfRows);
         return this.state.letters[col][row];
     }
 
@@ -58,15 +73,13 @@ export default class Grid extends Component {
         // is unique. Also, build word from itemsToDelete.
         const keyInt = parseInt(item.key, 10);
         if (this.itemsToDelete.indexOf(keyInt) === -1) {
-            
             this.itemsToDelete.push(keyInt);
-            this.setState(previousState => (
-                {
-                    word: (previousState.word + item.data).toUpperCase(),
-                    selectedItems: this.itemsToDelete,
-                    selectedItemsLength: this.itemsToDelete.length
-                }
-            ));
+            this.word = (this.word + item.data).toUpperCase();
+            this.props.updateWord(this.word);
+            this.setState({
+                selectedItems: this.itemsToDelete,
+                selectedItemsLength: this.itemsToDelete.length
+            });
         }
     }
 
@@ -95,35 +108,30 @@ export default class Grid extends Component {
                 newLetters.push(letterRow);
             }
             this.itemsToDelete = [];
-            return { letters: newLetters, word: '' };
+            this.props.updateWord('');
+            this.word = '';
+            return { letters: newLetters };
         });
     }
 
     render() {
         return (
-            <View>
-                <View
-                    {...this.panResponder.panHandlers}
-                    style={styles.grid}
-                    onLayout={this.onLayout}
-                >
-                    {
-                        this.state.letters.map((letterCol, i) =>
-                            <GridColumn
-                                letters={letterCol}
-                                key={i}
-                                selectedHandler={this.markItemForDeletion}
-                                selectedItems={this.state.selectedItems}
-                                selectedItemsLength={this.state.selectedItemsLength}
-                            />
-                        )
-                    }
-                </View>
-                <View style={styles.wordView}>
-                    <Text style={styles.word}>
-                        {this.state.word}
-                    </Text>
-                </View>
+            <View
+                {...this.panResponder.panHandlers}
+                style={styles.grid}
+                onLayout={this.onLayout}
+            >
+                {
+                    this.state.letters.map((letterCol, i) =>
+                        <GridColumn
+                            letters={letterCol}
+                            key={i}
+                            selectedHandler={this.markItemForDeletion}
+                            selectedItems={this.state.selectedItems}
+                            selectedItemsLength={this.state.selectedItemsLength}
+                        />
+                    )
+                }
             </View>
         );
     }
@@ -135,14 +143,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderWidth: 5,
         borderColor: '#e2d1ba',
-        backgroundColor: 'white'
-    },
-    wordView: {
-        height: 50,
-        alignItems: 'center'
-    },
-    word: {
-        fontSize: 30,
-        color: 'red'
+        backgroundColor: 'white',
+        aspectRatio: 0.8333
     }
 });

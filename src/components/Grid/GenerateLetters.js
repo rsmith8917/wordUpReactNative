@@ -4,7 +4,7 @@ export function generateLetterGrid() {
 
   for (let i = 0; i < 5; i++) {
     const letterRow = [];
-    for (let j = 0; j < 10; j++) {
+    for (let j = 0; j < 15; j++) {
       keyCount += 1;
       letterRow[j] = { key: keyCount.toString(), data: generateLetter() };
     }
