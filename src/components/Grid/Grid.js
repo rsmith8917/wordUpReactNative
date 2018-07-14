@@ -72,7 +72,19 @@ export default class Grid extends Component {
         const numOfRows = this.state.layout.height / boxEdgeLength;
         const col = posToIndex(relX, this.state.layout.width, numOfCols);
         const row = posToIndex(relY, this.state.layout.height, numOfRows);
-        return this.state.letters[col][row];
+        let letter = { key: '-1', data: '' };
+        const cornerSize = 10;
+        const inHitZoneXLeft = relX > ((col * boxEdgeLength) + cornerSize);
+        const inHitZoneXRight = relX < ((((col + 1) * boxEdgeLength) - cornerSize));
+        const inHitZoneX = inHitZoneXLeft && inHitZoneXRight;
+        const inHitZoneYTop = relY > ((row * boxEdgeLength) + cornerSize);
+        const inHitZoneYBottom = relY < ((((row + 1) * boxEdgeLength) - cornerSize));
+        const inHitZoneY = inHitZoneYTop && inHitZoneYBottom;
+        const inHitZone = inHitZoneX && inHitZoneY;
+        if (inHitZone) {
+            letter = this.state.letters[col][row];
+        }
+        return letter;
     }
 
     markItemForDeletion(item) {

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   wordView: {
     height: 50,
     alignItems: 'center',
-    backgroundColor: '#e2d1ba'
+    backgroundColor: '#c1b29e'
   },
   word: {
     fontSize: 30,
