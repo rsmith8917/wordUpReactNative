@@ -1,6 +1,6 @@
-# wordUpReactNative
+# Word Up
 
-Word search game that can be described as "Boggle meets Tetris".
+Word search game for Android that can be described as "Boggle meets Tetris".
 
 ## Getting Started
 
